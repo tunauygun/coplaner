@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>coplaner - About</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/gradient.css">
+</head>
+
+<body>
+<nav class="navbar navbar-expand-md gradient-background">
+    <div class="container container-fluid">
+        <a class="navbar-brand fw-bold" href="/">coplaner</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-link active mx-3" aria-current="page" href="/">Home</a>
+                <a class="nav-link mx-3" href="/select">Generate</a>
+                <a class="nav-link mx-3" href="/about">About</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    <h2 class="mb-4">About</h2>
+    <p>Welcome to coplaner, an unofficial web application that I developed with the goal of assisting Carleton University students in generating conflict-free timetables. As a Carleton University student, I understand the struggles of scheduling courses, and that's why I created coplaner. By simply providing a list of your courses, coplaner will do its best to find all possible conflict free timetables for your classes. It's my hope that coplaner can save you time and frustration as you plan your schedules. Thank you for using coplaner, and I hope you find it useful!</p>
+    <p>You can find the source code of coplaner here:</p>
+    <h2 class=" mt-5 pt-3 mb-4">Disclaimer</h2>
+    <p>coplaner is a web application designed to assist students in generating conflict-free timetables. Please note that the generated timetables are based on the information provided by the user and may not include all possible timetable options. It is important to review and cross-check the generated timetables with official university schedules for accuracy.</p>
+    <p>coplaner should be used as a helpful tool during the timetable planning process. However, you have to consult with academic advisors or official university resources for final timetable confirmation. I disclaim any liability for any loss, damage, or inconvenience arising from the use or reliance on coplaner.</p>
+    <p>Please understand that coplaner is a solo-developed web application and may have limitations or technical constraints. I appreciate your understanding and feedback as I continuously improve coplaner's functionality.</p>
+    <p class="mb-5 pb-5">By using coplaner, you acknowledge and agree to the above disclaimer and understand that the responsibility for course selections and timetable accuracy ultimately rests with you, the user.</p>
+</div>
+
+<footer style="background: #efefef" class="footer px-5 py-4 fixed-bottom text-center">
+    &copy; <%=new Date().getFullYear()%> coplaner
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+</body>
+</html>
