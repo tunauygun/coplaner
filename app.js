@@ -46,6 +46,10 @@ app.get('/about', (req, res) => {
     res.render('about')
 })
 
+app.get('/schedule', (req, res) => {
+    res.redirect('/select')
+})
+
 
 app.post('/schedule', (req, res) => {
     let selectedCourses = JSON.parse(req.body.selectedCourses);
