@@ -9,6 +9,7 @@ function TimetableCreator(courseFinder, requiredCourseNames, term) {
 
     let getCourseOptions = function () {
         let col = [];
+        console.log(requiredCourseNames)
         for(const courseName of requiredCourseNames) {
             const [subject, code] = courseName.trim().split(" ")
             const courseSections = courseFinder.getCourse(term, subject, code, null)
@@ -21,10 +22,8 @@ function TimetableCreator(courseFinder, requiredCourseNames, term) {
         let validTimetables = [];
         let courseOptions = getCourseOptions();
         console.log("Found " + courseOptions.length + " course options.");
-        console.log("courseOptions = " + courseOptions);
         let courseCombinations = this.getCourseCombinations(courseOptions);
-        console.log("Found " + courseCombinations.length + " course combinations.");
-        console.log("courseCombinations = " + courseCombinations);
+        console.log("Found " + courseCombinations.length + " course combinations.\n");
         let courseCombinationsWithDependencies = this.getCourseCombinationsWithDependencies(courseCombinations);
         for (const cl of courseCombinationsWithDependencies) {
             let t = new Timetable(cl);
