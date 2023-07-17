@@ -1,4 +1,5 @@
 # coplaner
+![Home page of coplaner](https://github.com/tunauygun/coplaner/blob/main/doc/img/schedulePage.png)
 Welcome to coplaner, an unofficial web application that I developed with the goal of assisting Carleton University students in generating conflict-free timetables. As a Carleton University student, I understand the struggles of scheduling courses, and that's why I created coplaner. By simply providing a list of your courses, coplaner will do its best to find all possible conflict free timetables for your classes. It's my hope that coplaner can save you time and frustration as you plan your schedules. Thank you for using coplaner, and I hope you find it useful!
 
 ## Disclaimer
