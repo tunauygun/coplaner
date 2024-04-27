@@ -180,6 +180,7 @@ async function createTables(db) {
             crn               int primary key not null,
             term              int             not null,
             subject           text            not null,
+            number            int             not null,
             section           text            not null,
             title             text            not null,
             credits           real            not null,
@@ -196,6 +197,7 @@ async function createTables(db) {
             id         INTEGER PRIMARY KEY AUTOINCREMENT,
             term       int  not null,
             subject    text not null,
+            number     int  not null,
             section    text not null,
             day        text not null,
             start_time text not null,
@@ -205,10 +207,10 @@ async function createTables(db) {
 }
 
 function insertCourse(db, course) {
-    db.run(`INSERT INTO courses (crn, term, subject, section, title, credits, type, has_restrictions, has_prerequisites,
+    db.run(`INSERT INTO courses (crn, term, subject, number, section, title, credits, type, has_restrictions, has_prerequisites,
                                  instructor, section_info, also_register_in)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?)`, [parseInt(course.crn), parseInt(course.term), course.subject, course.section, course.title, parseFloat(course.credits), course.type, course.has_restrictions, course.has_prerequisites, course.instructor, course.section_info, course.also_register_in], function (error) {
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                    ?)`, [parseInt(course.crn), parseInt(course.term), course.subject, parseInt(course.number), course.section, course.title, parseFloat(course.credits), course.type, course.has_restrictions, course.has_prerequisites, course.instructor, course.section_info, course.also_register_in], function (error) {
         if (error) {
             console.error(error.message);
         }
@@ -216,9 +218,9 @@ function insertCourse(db, course) {
 
     for (const time of course.times) {
         for (const day of time.days) {
-            db.run(`INSERT INTO courseSchedule (term, subject, section, day, start_time, end_time)
-                    VALUES (?, ?, ?, ?, ?,
-                            ?)`, [parseInt(course.term), course.subject, course.section, day, time.startTime, time.endTime], function (error) {
+            db.run(`INSERT INTO courseSchedule (term, subject, number, section, day, start_time, end_time)
+                    VALUES (?, ?, ?, ?, ?, ?,
+                            ?)`, [parseInt(course.term), course.subject, parseInt(course.number), course.section, day, time.startTime, time.endTime], function (error) {
                 if (error) {
                     console.error(error.message);
                 }
@@ -246,7 +248,8 @@ function formatCourseRowsToCourse(rows, termCode) {
             if (courseRow.length === 11) {
                 course.crn = courseRow[2]
                 course.term = termCode
-                course.subject = courseRow[3]
+                course.subject = courseRow[3].split(" ")[0]
+                course.number = courseRow[3].split(" ")[1]
                 course.section = courseRow[4]
                 course.title = courseRow[5]
                 course.credits = courseRow[6]

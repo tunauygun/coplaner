@@ -37,8 +37,14 @@
         <div class="col">
             <label for="termSelector" class="form-label">Term</label>
             <select class="form-select" aria-label="Default select example" id="termSelector">
-                <% for (const term of Object.keys(termNames)){ %>
-                    <option value=<%=term%>><%=termNames[term]%></option>
+                <%   const getTermNameFromTermCode = function (termCode) {
+                        const termSeasons = ["Winter", "Summer", "Fall"]
+                        let termYear = termCode.trim().substring(0, 4)
+                        let termSeasonCode = parseInt(termCode.trim().substring(4, 5))-1
+                        return termSeasons[termSeasonCode] + " " + termYear
+                }%>
+                <% for (const term of Object.keys(courseCodes)){ %>
+                    <option value=<%=term%>><%=getTermNameFromTermCode(term)%></option>
                 <% } %>
             </select>
         </div>
@@ -47,7 +53,7 @@
         <div class="col">
             <label for="subjectSelector" class="form-label">Subject</label>
             <select class="form-select" aria-label="Default select example" id="subjectSelector">
-                <% for (const subject of Object.keys(courseNames[Object.keys(termNames)[0]])){ %>
+                <% for (const subject of Object.keys(courseCodes[Object.keys(courseCodes)[0]])){ %>
                     <option value=<%=subject%>><%=subject%></option>
                 <% } %>
             </select>
@@ -55,7 +61,7 @@
         <div class="col">
             <label for="codeSelector" class="form-label">Code</label>
             <select class="form-select" aria-label="Default select example" id="codeSelector">
-                <% for (const code of courseNames[Object.keys(termNames)[0]][Object.keys(courseNames[Object.keys(termNames)[0]])[0]]){ %>
+                <% for (const code of courseCodes[Object.keys(courseCodes)[0]][Object.keys(courseCodes[Object.keys(courseCodes)[0]])[0]] ){ %>
                 <option value=<%=code%>><%=code%></option>
                 <% } %>
             </select>
@@ -89,22 +95,22 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
 <script src="/js/courseSelection.js"></script>
 <script>
-    let courseNames = <%-JSON.stringify(courseNames) %>;
+    let courseCodes = <%-JSON.stringify(courseCodes) %>;
     let selectedCourses = [];
 
     $("#termSelector").on( "change", function() {
         let termCode = this.value
-        let firstSubject = Object.keys(courseNames[termCode])[0]
+        let firstSubject = Object.keys(courseCodes[termCode])[0]
 
         $("#subjectSelector").empty()
-        for(const subj of Object.keys(courseNames[termCode])){
+        for(const subj of Object.keys(courseCodes[termCode])){
             let subjectOption = "<option value=" + subj + ">" + subj + "</option>";
             $('#subjectSelector').append(subjectOption);
         }
 
 
         $("#codeSelector").empty()
-        for(const code of courseNames[termCode][firstSubject]){
+        for(const code of courseCodes[termCode][firstSubject]){
             let codeOption = "<option value=" + code + ">" + code + "</option>";
             $('#codeSelector').append(codeOption);
         }
@@ -115,7 +121,7 @@
         let subject = this.value
 
         $("#codeSelector").empty()
-        for(const code of courseNames[termCode][subject]){
+        for(const code of courseCodes[termCode][subject]){
             let codeOption = "<option value=" + code + ">" + code + "</option>";
             $('#codeSelector').append(codeOption);
         }
@@ -124,6 +130,7 @@
     let removeItem = function (subject, code) {
         $(`#li_${subject}${code}`).remove();
         selectedCourses.splice(selectedCourses.indexOf(subject+" "+code), 1);
+        $("#courseFormCourses").val(JSON.stringify(selectedCourses))
         if(selectedCourses.length === 0){
             $("#courseListTitle").text("").removeClass("border-top")
             $("#termSelector").prop('disabled', false);
