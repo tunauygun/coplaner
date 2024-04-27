@@ -93,8 +93,7 @@ function Course(termCode, status, crn, subject, courseCode, section, title, cred
             (value, index) => start + index * step
         );
 
-    this.getTimeRangeFromStartAndEndTimes = function (start, end){
-        return arrayRange(start, end-1, 1)
+    this.getTimeRangeFromStartAndEndTimes = function (start, end){        return arrayRange(start, end-1, 1)
     }
 
     const timeStringToNumericTimeFormat = function (time, dayString){
