@@ -97,39 +97,6 @@ async function getCourseTableRows(termCode, courseCode) {
     })
 }
 
-function generateCombinations(groups) {
-    // Base case: if the groups array is empty, return an array with an empty combination
-    if (groups.length === 0) {
-        return [[]];
-    }
-
-    // Get the first group from the array
-    const currentGroup = groups[0];
-
-    // Get the remaining groups
-    const remainingGroups = groups.slice(1);
-
-    // Recursively generate combinations for the remaining groups
-    const remainingCombinations = generateCombinations(remainingGroups);
-
-    // Initialize an array to store all combinations
-    const combinations = [];
-
-    // Iterate over each item in the current group
-    for (const item of currentGroup) {
-        // For each item in the current group, iterate over each combination of the remaining groups
-        for (const combination of remainingCombinations) {
-            // Create a new combination by adding the current item to the existing combination
-            const newCombination = [item, ...combination];
-            // Push the new combination to the combinations array
-            combinations.push(newCombination);
-        }
-    }
-
-    // Return all combinations
-    return combinations;
-}
-
 
 function groupTableRowsByCourse(rows) {
     let courseRows = []
@@ -187,6 +154,7 @@ async function createTables(db) {
             type              text            not null,
             has_restrictions  int             not null,
             has_prerequisites int             not null,
+            is_synchronous    int             not null,
             instructor        text,
             section_info      text,
             also_register_in  text
@@ -207,12 +175,14 @@ async function createTables(db) {
 }
 
 function insertCourse(db, course) {
-    db.run(`INSERT INTO courses (crn, term, subject, number, section, title, credits, type, has_restrictions, has_prerequisites,
+    db.run(`INSERT INTO courses (crn, term, subject, number, section, title, credits, type, has_restrictions, has_prerequisites, is_synchronous,
                                  instructor, section_info, also_register_in)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?)`, [parseInt(course.crn), parseInt(course.term), course.subject, parseInt(course.number), course.section, course.title, parseFloat(course.credits), course.type, course.has_restrictions, course.has_prerequisites, course.instructor, course.section_info, course.also_register_in], function (error) {
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                    ?)`, [course.crn, course.term, course.subject, course.number, course.section, course.title, course.credits, course.type, course.has_restrictions, course.has_prerequisites, course.is_synchronous, course.instructor, course.section_info, course.also_register_in], function (error) {
         if (error) {
             console.error(error.message);
+            console.log("\n")
+            console.log(c)
         }
     });
 
@@ -220,13 +190,12 @@ function insertCourse(db, course) {
         for (const day of time.days) {
             db.run(`INSERT INTO courseSchedule (term, subject, number, section, day, start_time, end_time)
                     VALUES (?, ?, ?, ?, ?, ?,
-                            ?)`, [parseInt(course.term), course.subject, parseInt(course.number), course.section, day, time.startTime, time.endTime], function (error) {
+                            ?)`, [course.term, course.subject, course.number, course.section, day, time.startTime, time.endTime], function (error) {
                 if (error) {
                     console.error(error.message);
                 }
             });
         }
-
     }
 }
 
@@ -246,18 +215,19 @@ function formatCourseRowsToCourse(rows, termCode) {
 
         for (let courseRow of courseRows) {
             if (courseRow.length === 11) {
-                course.crn = courseRow[2]
-                course.term = termCode
+                course.crn = parseInt(courseRow[2])
+                course.term = parseInt(termCode)
                 course.subject = courseRow[3].split(" ")[0]
-                course.number = courseRow[3].split(" ")[1]
+                course.number = parseInt(courseRow[3].split(" ")[1])
                 course.section = courseRow[4]
                 course.title = courseRow[5]
-                course.credits = courseRow[6]
+                course.credits = parseFloat(courseRow[6])
                 course.type = courseRow[7]
                 course.has_restrictions = courseRow[8] === "Yes"
                 course.has_prerequisites = courseRow[9] === "Yes"
                 course.instructor = courseRow[10]
                 course.times = []
+                course.is_synchronous = false
 
             } else {
                 let courseInfo = courseRow[0].trim();
@@ -277,6 +247,9 @@ function formatCourseRowsToCourse(rows, termCode) {
                     course.times.push({
                         days: daysList, startTime: startTime, endTime: endTime
                     })
+                    if(!course.is_synchronous && timeString){
+                        course.is_synchronous = true
+                    }
                 } else if (courseInfo.startsWith("Section Information:")) {
                     course.section_info = courseInfo.substring("Section Information:".length).trim()
                 } else if (courseInfo.startsWith("Also Register in:")) {
@@ -311,4 +284,3 @@ async function main() {
 }
 
 main()
-
