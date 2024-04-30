@@ -49,7 +49,7 @@ app.post('/schedule', async (req, res) => {
 app.get('/example', async (req, res) => {
     const db = await sqlite.open({filename: 'courses.db', driver: sqlite3.Database})
 
-    let selectedCourses = ["SYSC 3101", "SYSC 3303", "SYSC 4106", "SYSC 4120", "COMP 3005", "ELEC 2507"];
+    let selectedCourses = ["SYSC 3101", "SYSC 3303", "SYSC 4106", "SYSC 4120", "COMP 3005", "ELEC 2507", "ECOR 2995"];
     let termCode = 202410;
 
     let tc = new TimetableCreator(termCode, selectedCourses, db);

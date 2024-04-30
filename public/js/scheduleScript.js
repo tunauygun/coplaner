@@ -99,22 +99,11 @@ let schedule = {
         return dayMap[lowercaseDayString];
       }
 
-      for(const c of schedule.timetables[schedule.index]) {
+      for(const c of schedule.timetables[schedule.index].filter(course => course.is_synchronous === 1)) {
         schedule.activities.add(convertDaysOfWeekToNumbers(c.day), c.subject + " " + c.number , c.start_time + "-" + c.end_time, "", c.section, c.instructor, "red");
       }
 
-      // for(const c of schedule.timetables[schedule.index].courses){
-      //   for(const ctl of c.ctls){
-      //     for(const day of ctl.dayInts){
-      //       if(ctl.room === "LINE") {
-      //         ctl.room = "Online"
-      //       }
-      //       schedule.activities.add(day, c.subject + " " + c.courseCode , ctl.startTime + "-" + ctl.endTime, ctl.room, c.section, c.instructor, "red");
-      //     }
-      //   }
-      // }
-
-      // updateUnscheduledCourseList()
+      updateUnscheduledCourseList()
     }
   }
   
@@ -123,11 +112,12 @@ let schedule = {
 schedule.initialize();
 
 let updateUnscheduledCourseList = function () {
-  let unscheduledCourses = schedule.timetables[schedule.index].courses.filter(course => course.courseTimeString === "")
+  let unscheduledCourses = schedule.timetables[schedule.index].filter(course => course.is_synchronous === 0)
+
   if(unscheduledCourses.length > 0){
     $("#unscheduledCoursesList").empty()
     for (const course of unscheduledCourses) {
-      let item = "<li>" + course.subject + " " + course.courseCode + "</li>";
+      let item = "<li>" + course.subject + " " + course.number + "</li>";
       $("#unscheduledCoursesList").append(item)
     }
     $("#unscheduledCoursesDiv").removeClass("invisible")

@@ -55,12 +55,12 @@ function TimetableCreator(term, requiredCourseNames, db) {
 
             const query = `
                 SELECT c.*, s.day, s.start_time, s.end_time
-                FROM courseSchedule s
-                         JOIN courses c ON c.term = s.term AND c.subject = s.subject AND c.number = s.number AND c.section = s.section
-                WHERE s.term = 202410
+                FROM courses c
+                         LEFT OUTER JOIN courseSchedule s ON c.term = s.term AND c.subject = s.subject AND c.number = s.number AND c.section = s.section
+                WHERE c.term = ${term}
                   AND (
                     ${courseList.map((c, index) => `
-                    (s.subject = '${c[0]}' AND s.number = ${c[1]} AND s.section = '${c[2]}')
+                    (c.subject = '${c[0]}' AND c.number = ${c[1]} AND c.section = '${c[2]}')
                 `).join('OR')}
                     )
             `;
@@ -194,10 +194,9 @@ module.exports.TimetableCreator = TimetableCreator;
 
 // async function run() {
 //     const db = await sqlite.open({filename: 'courses.db', driver: sqlite3.Database})
-//     // const tc = new TimetableCreator(202410, ["SYSC 3101", "SYSC 3303", "SYSC 4106", "SYSC 4120", "COMP 3005", "ELEC 2507"], db);
 //     const tc = new TimetableCreator(202410, ["SYSC 3101", "SYSC 3303", "SYSC 4106", "SYSC 4120", "COMP 3005", "ELEC 2507", "ECOR 2995"], db);
-//     const x = await tc.generateTimetables()
-//     console.log(x.length)
+//     const ts = await tc.generateTimetables()
+//     console.log(ts)
 // }
 //
 // run()
