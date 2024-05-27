@@ -22,6 +22,23 @@ async function getCourseCodes(db) {
 
 }
 
+async function getAcademicYear(db) {
+    const query = `
+        SELECT DISTINCT term
+        FROM courses;
+    `;
+
+    const result = await db.all(query)
+
+    const years = result.map(r => Math.floor(r.term / 100));
+    const earliestYear = Math.min(...years);
+    const latestYear = Math.max(...years);
+
+    return earliestYear + "-" + latestYear;
+}
+
+
+
 async function main() {
     const db = await sqlite.open({
         filename: 'courses.db', driver: sqlite3.Database
@@ -32,4 +49,5 @@ async function main() {
 }
 
 module.exports.getCourseCodes = getCourseCodes;
+module.exports.getAcademicYear = getAcademicYear;
 

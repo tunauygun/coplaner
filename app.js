@@ -3,7 +3,7 @@ const bodyParser = require('body-parser')
 const sqlite = require("sqlite");
 const sqlite3 = require("sqlite3");
 
-const {getCourseCodes} = require("./database");
+const {getCourseCodes, getAcademicYear} = require("./database");
 const {TimetableCreator} = require("./TimetableCreator");
 
 const app = express();
@@ -13,8 +13,12 @@ app.set('view engine', 'ejs')
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({extended: false}))
 
-app.get('/', (req, res) => {
-    res.render('home')
+app.get('/', async (req, res) => {
+    const db = await sqlite.open({
+        filename: 'courses.db', driver: sqlite3.Database
+    })
+    const years = await getAcademicYear(db);
+    res.render('home', {academicYear: years})
 })
 
 app.get('/select', async (req, res) => {

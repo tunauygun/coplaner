@@ -10,3 +10,8 @@ coplaner should be used as a helpful tool during the timetable planning process.
 Please understand that coplaner is a solo-developed web application and may have limitations or technical constraints. I appreciate your understanding and feedback as I continuously improve coplaner's functionality.
 
 By using coplaner, you acknowledge and agree to the above disclaimer and understand that the responsibility for course selections and timetable accuracy ultimately rests with you, the user.
+
+## Database Update
+Last Updated: May 27, 2024
+
+The coplaner database is periodically updated to ensure accurate course information. While efforts are made to keep the database current, please note that updates may not occur on a strict schedule. The last update was performed on May 27, 2024. Please understand that there may be occasional delays in updating course information due to various factors. Thank you for your patience and understanding.

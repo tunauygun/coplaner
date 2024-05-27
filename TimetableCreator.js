@@ -192,11 +192,11 @@ function TimetableCreator(term, requiredCourseNames, db) {
 
 module.exports.TimetableCreator = TimetableCreator;
 
-// async function run() {
-//     const db = await sqlite.open({filename: 'courses.db', driver: sqlite3.Database})
-//     const tc = new TimetableCreator(202410, ["SYSC 3101", "SYSC 3303", "SYSC 4106", "SYSC 4120", "COMP 3005", "ELEC 2507", "ECOR 2995"], db);
-//     const ts = await tc.generateTimetables()
-//     console.log(ts)
-// }
-//
-// run()
+async function run() {
+    const db = await sqlite.open({filename: 'courses.db', driver: sqlite3.Database})
+    const tc = new TimetableCreator(202430, ["MATH 1005", "SYSC 2006", "SYSC 2310", "ELEC 2501", "COMP 1805"], db);
+    const ts = await tc.generateTimetables()
+    console.log(ts.length)
+}
+
+run()
