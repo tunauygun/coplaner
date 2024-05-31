@@ -26,7 +26,6 @@ app.get('/select', async (req, res) => {
         filename: 'courses.db', driver: sqlite3.Database
     })
     let courseCodes = await getCourseCodes(db)
-    console.log(courseCodes)
     res.render('selectCourses', {courseCodes})
 })
 
@@ -45,8 +44,8 @@ app.post('/schedule', async (req, res) => {
     let termCode = req.body.term;
 
     let tc = new TimetableCreator(termCode, selectedCourses, db);
-    const timetables = await tc.generateTimetables()
-    res.render('schedule', {t: timetables})
+    const {timetables, maxScheduleCountReached} = await tc.generateTimetables()
+    res.render('schedule', {t: timetables, limitReached: maxScheduleCountReached})
 })
 
 
@@ -54,11 +53,11 @@ app.get('/example', async (req, res) => {
     const db = await sqlite.open({filename: 'courses.db', driver: sqlite3.Database})
 
     let selectedCourses = ["SYSC 3101", "SYSC 3303", "SYSC 4106", "SYSC 4120", "COMP 3005", "ELEC 2507", "ECOR 2995"];
-    let termCode = 202410;
+    let termCode = 202510;
 
     let tc = new TimetableCreator(termCode, selectedCourses, db);
-    const timetables = await tc.generateTimetables()
-    res.render('schedule', {t: timetables})
+    const {timetables, maxScheduleCountReached} = await tc.generateTimetables()
+    res.render('schedule', {t: timetables, limitReached: maxScheduleCountReached});
 })
 
 app.listen(3000, () => {

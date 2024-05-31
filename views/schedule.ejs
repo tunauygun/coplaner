@@ -35,6 +35,12 @@
         <div class='info text-center' >
             <h3 id="title">Schedule 1/2</h3>
         </div>
+        <% if(limitReached){ %>
+        <div class="alert alert-warning alert-dismissible fade show col-6 offset-3" role="alert">
+            <strong>Warning:</strong> There are too many possible schedule options! Only the first 50 are shown!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <% } %>
         <div class='d-flex justify-content-evenly mb-4'>
             <div class="text-center">
                 <button id="copyCRNs" class="btn btn-outline-dark btn-sm" type="button"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-copy" viewBox="0 0 16 16">

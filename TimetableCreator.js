@@ -43,7 +43,22 @@ function TimetableCreator(term, requiredCourseNames, db) {
     this.generateTimetables = async function () {
         const unfilteredScheduleOptions = await getAllScheduleOptions()
 
-        const allScheduleOptions = await filterForConflictFreeSchedules(unfilteredScheduleOptions)
+        let maxScheduleCountReached = false;
+        const MAX_SCHEDULE_LIMIT = 50;
+        const chunkSize = MAX_SCHEDULE_LIMIT / 5;
+
+        let allScheduleOptions = [];
+        for (let i = 0; i < unfilteredScheduleOptions.length; i += chunkSize) {
+            if(allScheduleOptions.length >= MAX_SCHEDULE_LIMIT ){
+                allScheduleOptions = allScheduleOptions.slice(0, MAX_SCHEDULE_LIMIT);
+                maxScheduleCountReached = true;
+                break;
+            }
+
+            let chunk = unfilteredScheduleOptions.slice(i, i + chunkSize);
+            let processedChunk = await filterForConflictFreeSchedules(chunk);
+            allScheduleOptions.push(...processedChunk);
+        }
 
         let timetables = []
 
@@ -69,7 +84,7 @@ function TimetableCreator(term, requiredCourseNames, db) {
             timetables.push(result);
         }
 
-        return timetables;
+        return {timetables, maxScheduleCountReached};
     }
 
     let filterForConflictFreeSchedules = async function (unfilteredScheduleOptions) {
@@ -130,7 +145,15 @@ function TimetableCreator(term, requiredCourseNames, db) {
     let getAllScheduleOptions = async function () {
         let scheduleSelectionGroups = []
         for (const requiredCourseName of requiredCourseNames) {
-            const allOptionsForCourse = await getAllOptionsForCourse(requiredCourseName)
+            const allOptionsForCourse_unfiltered = await getAllOptionsForCourse(requiredCourseName)
+
+            let allOptionsForCourse = []
+            for (let c of allOptionsForCourse_unfiltered) {
+                const hasNoConflict = (await checkScheduleForConflict(c)) === 0
+                if(hasNoConflict){
+                    allOptionsForCourse.push(c)
+                }
+            }
             scheduleSelectionGroups.push(allOptionsForCourse);
         }
         let possibleCombinations = generateCombinations(scheduleSelectionGroups)
@@ -192,11 +215,11 @@ function TimetableCreator(term, requiredCourseNames, db) {
 
 module.exports.TimetableCreator = TimetableCreator;
 
-async function run() {
-    const db = await sqlite.open({filename: 'courses.db', driver: sqlite3.Database})
-    const tc = new TimetableCreator(202430, ["MATH 1005", "SYSC 2006", "SYSC 2310", "ELEC 2501", "COMP 1805"], db);
-    const ts = await tc.generateTimetables()
-    console.log(ts.length)
-}
-
-run()
+// async function run() {
+//     const db = await sqlite.open({filename: 'courses.db', driver: sqlite3.Database})
+//     const tc = new TimetableCreator(202430, ["MATH 1005", "SYSC 2006", "SYSC 2310", "ELEC 2501", "COMP 1805"], db);
+//     const ts = await tc.generateTimetables()
+//     console.log(ts.length)
+// }
+//
+// run()
