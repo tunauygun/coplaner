@@ -52,12 +52,30 @@ app.post('/schedule', async (req, res) => {
 app.get('/example', async (req, res) => {
     const db = await sqlite.open({filename: 'courses.db', driver: sqlite3.Database})
 
-    let selectedCourses = ["SYSC 3101", "SYSC 3303", "SYSC 4106", "SYSC 4120", "COMP 3005", "ELEC 2507", "ECOR 2995"];
     let termCode = 202510;
+    let selectedCourses = {
+        "ECOR_2995": ["A"],
+        "ELEC_2507": ["A", "B"],
+        "COMP_3005": ["A", "B"],
+        "SYSC_4120": ["A"],
+        "SYSC_4106": ["A"],
+        "SYSC_3303": ["A", "B"],
+        "SYSC_3101": ["A"]
+    };
 
     let tc = new TimetableCreator(termCode, selectedCourses, db);
     const {timetables, maxScheduleCountReached} = await tc.generateTimetables()
     res.render('schedule', {t: timetables, limitReached: maxScheduleCountReached});
+})
+
+app.get('/db/courseSections/:term/:subject/:number', async (req, res) => {
+    const {term, subject, number} = req.params
+
+    const db = await sqlite.open({filename: 'courses.db', driver: sqlite3.Database})
+    const courses = await db.all('SELECT * FROM courses WHERE term = ? AND subject = ? AND number = ? AND length(section) = 1', [term, subject, number]);
+
+    console.log(courses.map(course => course.section))
+    res.send(courses.map(course => course.section));
 })
 
 app.listen(3000, () => {

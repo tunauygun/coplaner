@@ -144,8 +144,9 @@ function TimetableCreator(term, requiredCourseNames, db) {
 
     let getAllScheduleOptions = async function () {
         let scheduleSelectionGroups = []
-        for (const requiredCourseName of requiredCourseNames) {
-            const allOptionsForCourse_unfiltered = await getAllOptionsForCourse(requiredCourseName)
+        for (const requiredCourseName of Object.keys(requiredCourseNames)) {
+            const courseSections = requiredCourseNames[requiredCourseName];
+            const allOptionsForCourse_unfiltered = await getAllOptionsForCourse(requiredCourseName, courseSections)
 
             let allOptionsForCourse = []
             for (let c of allOptionsForCourse_unfiltered) {
@@ -161,11 +162,11 @@ function TimetableCreator(term, requiredCourseNames, db) {
     }
 
 
-    let getAllOptionsForCourse = async function (courseCode) {
-        const courseCodeSeperated = courseCode.split(" ")
+    let getAllOptionsForCourse = async function (courseCode, courseSections) {
+        const courseCodeSeperated = courseCode.split("_")
         const subject = courseCodeSeperated[0];
         const number = parseInt(courseCodeSeperated[1]);
-        const result = await db.all('SELECT * FROM courses WHERE term = ? AND subject = ? AND number = ? AND length(section) = 1', [term, subject, number]);
+        const result = await db.all(`SELECT * FROM courses WHERE term = ? AND subject = ? AND number = ? AND section IN ("${courseSections.join('", "')}")`, [term, subject, number]);
 
         let allOptions = []
 
@@ -215,11 +216,20 @@ function TimetableCreator(term, requiredCourseNames, db) {
 
 module.exports.TimetableCreator = TimetableCreator;
 
+// Testing TimetableCreator
 // async function run() {
 //     const db = await sqlite.open({filename: 'courses.db', driver: sqlite3.Database})
-//     const tc = new TimetableCreator(202430, ["MATH 1005", "SYSC 2006", "SYSC 2310", "ELEC 2501", "COMP 1805"], db);
-//     const ts = await tc.generateTimetables()
-//     console.log(ts.length)
+//     const tc = new TimetableCreator(202510, {
+//         "ECOR_2995":["A"],
+//         "ELEC_2507":["A","B"],
+//         "COMP_3005":["A","B"],
+//         "SYSC_4120":["A"],
+//         "SYSC_4106":["A"],
+//         "SYSC_3303":["A","B"],
+//         "SYSC_3101":["A"]
+//     }, db);
+//     const {timetables, maxScheduleCountReached} = await tc.generateTimetables()
+//     console.log(timetables.length)
 // }
 //
 // run()
