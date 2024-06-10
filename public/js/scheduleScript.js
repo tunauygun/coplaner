@@ -110,6 +110,7 @@ let schedule = {
 }
 
 schedule.initialize();
+schedule.index = 0;
 
 let updateUnscheduledCourseList = function () {
   let unscheduledCourses = schedule.timetables[schedule.index].filter(course => course.is_synchronous === 0)
@@ -140,8 +141,6 @@ let prevSchedule = function() {
   }
 }
 
-
-
 $("#next").on( "click", nextSchedule);
 $("#prev").on( "click", prevSchedule);
 
@@ -150,5 +149,42 @@ document.addEventListener("keydown", (event) => {
     nextSchedule()
   }else if(event.key === "ArrowLeft"){
     prevSchedule()
+  }
+});
+
+
+$("#copyCRNs").click(function() {
+  let crns = [...new Set(schedule.timetables[schedule.index].map(c => c.crn))].join(", ")
+  navigator.clipboard.writeText(crns);
+  let $this = $("#copyCRNsText")
+
+  let oldText = " Copy CRNs";
+  $this.text(" Copied");
+  setTimeout(function() {
+    $this.text(oldText);
+  }, 500);
+});
+
+
+$.ajax({
+  url: `api/generateTimeTable/${term}/${courses}`,
+  method: 'GET',
+  success: function(response) {
+    schedule.timetables = response.timetables;
+    if(!response.limitReached){
+      $("#limitReachedWarning").hide()
+    }
+    $("#loadingDiv").addClass("invisible")
+    schedule.len = schedule.timetables.length
+    if(schedule.timetables.length !== 0){
+      schedule.activities.update()
+      $("#scheduleContent").removeClass("invisible")
+    }else{
+      $("#noScheduleDiv").removeClass("invisible")
+    }
+  },
+  error: function(xhr, status, error) {
+    alert("Error: Cannot get the generated timetables from the server! Try again later!")
+    location.reload()
   }
 });

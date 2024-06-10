@@ -38,20 +38,14 @@ app.get('/schedule', (req, res) => {
 })
 
 app.post('/schedule', async (req, res) => {
-    const db = await sqlite.open({filename: 'courses.db', driver: sqlite3.Database})
-
-    let selectedCourses = JSON.parse(req.body.selectedCourses);
+    let selectedCourses = req.body.selectedCourses;
     let termCode = req.body.term;
 
-    let tc = new TimetableCreator(termCode, selectedCourses, db);
-    const {timetables, maxScheduleCountReached} = await tc.generateTimetables()
-    res.render('schedule', {t: timetables, limitReached: maxScheduleCountReached})
+    res.render('schedule', {selectedCourses, termCode})
 })
 
 
 app.get('/example', async (req, res) => {
-    const db = await sqlite.open({filename: 'courses.db', driver: sqlite3.Database})
-
     let termCode = 202510;
     let selectedCourses = {
         "ECOR_2995": ["A"],
@@ -62,13 +56,12 @@ app.get('/example', async (req, res) => {
         "SYSC_3303": ["A", "B"],
         "SYSC_3101": ["A"]
     };
+    selectedCourses = JSON.stringify(selectedCourses)
 
-    let tc = new TimetableCreator(termCode, selectedCourses, db);
-    const {timetables, maxScheduleCountReached} = await tc.generateTimetables()
-    res.render('schedule', {t: timetables, limitReached: maxScheduleCountReached});
+    res.render('schedule', {selectedCourses, termCode})
 })
 
-app.get('/db/courseSections/:term/:subject/:number', async (req, res) => {
+app.get('/api/courseSections/:term/:subject/:number', async (req, res) => {
     const {term, subject, number} = req.params
 
     const db = await sqlite.open({filename: 'courses.db', driver: sqlite3.Database})
@@ -76,6 +69,18 @@ app.get('/db/courseSections/:term/:subject/:number', async (req, res) => {
 
     console.log(courses.map(course => course.section))
     res.send(courses.map(course => course.section));
+})
+
+app.get('/api/generateTimeTable/:term/:courses', async (req, res) => {
+    const selectedCourses = JSON.parse(req.params.courses);
+    const termCode = req.params.term;
+
+    const db = await sqlite.open({filename: 'courses.db', driver: sqlite3.Database})
+
+    let tc = new TimetableCreator(termCode, selectedCourses, db);
+    const {timetables, maxScheduleCountReached} = await tc.generateTimetables()
+
+    res.send({timetables: timetables, limitReached: maxScheduleCountReached});
 })
 
 app.listen(3000, () => {

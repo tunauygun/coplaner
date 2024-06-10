@@ -72,7 +72,7 @@ $("#addButton").on( "click", function() {
 
     let sectionOptions = [];
     $.ajax({
-        url: `db/courseSections/${term}/${subject}/${code}`,
+        url: `api/courseSections/${term}/${subject}/${code}`,
         method: 'GET',
         success: function(response) {
             sectionOptions = response;
