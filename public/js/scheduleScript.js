@@ -165,6 +165,9 @@ $("#copyCRNs").click(function() {
   }, 500);
 });
 
+$("#exportPdfButton").click(function() {
+  window.print()
+});
 
 $.ajax({
   url: `api/generateTimeTable/${term}/${courses}`,
