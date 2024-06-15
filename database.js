@@ -50,4 +50,3 @@ async function main() {
 
 module.exports.getCourseCodes = getCourseCodes;
 module.exports.getAcademicYear = getAcademicYear;
-

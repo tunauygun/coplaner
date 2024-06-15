@@ -171,6 +171,15 @@ async function createTables(db) {
             start_time text not null,
             end_time   text not null
         );
+
+        create table if not exists logs
+        (
+            id                integer primary key autoincrement,
+            severity          text            not null,
+            event_type        text            not null,
+            message           text            not null,
+            timestamp         datetime        default current_timestamp
+        );
     `);
 }
 

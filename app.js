@@ -1,3 +1,4 @@
+const dotenv = require('dotenv').config()
 const express = require("express");
 const bodyParser = require('body-parser')
 const sqlite = require("sqlite");
@@ -7,10 +8,12 @@ const rateLimit = require("express-rate-limit");
 
 const {getCourseCodes, getAcademicYear} = require("./database");
 const {TimetableCreator} = require("./TimetableCreator");
+const {Logger} = require('./logger');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
+let db, logger;
 app.set('view engine', 'ejs')
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({extended: false}))
@@ -32,22 +35,18 @@ const limiter = rateLimit({
 app.use(limiter)
 
 app.get('/', async (req, res) => {
-    const db = await sqlite.open({
-        filename: 'courses.db', driver: sqlite3.Database
-    })
     const years = await getAcademicYear(db);
+    logger.logInfo("visit", "/home")
     res.render('home', {academicYear: years})
 })
 
 app.get('/select', async (req, res) => {
-    const db = await sqlite.open({
-        filename: 'courses.db', driver: sqlite3.Database
-    })
     let courseCodes = await getCourseCodes(db)
     res.render('selectCourses', {courseCodes})
 })
 
 app.get('/about', (req, res) => {
+    logger.logInfo("visit", "/about")
     res.render('about')
 })
 
@@ -81,10 +80,8 @@ app.get('/example', async (req, res) => {
 app.get('/api/courseSections/:term/:subject/:number', async (req, res) => {
     const {term, subject, number} = req.params
 
-    const db = await sqlite.open({filename: 'courses.db', driver: sqlite3.Database})
     const courses = await db.all('SELECT * FROM courses WHERE term = ? AND subject = ? AND number = ? AND length(section) = 1', [term, subject, number]);
 
-    console.log(courses.map(course => course.section))
     res.send(courses.map(course => course.section));
 })
 
@@ -92,14 +89,33 @@ app.get('/api/generateTimeTable/:term/:courses', async (req, res) => {
     const selectedCourses = JSON.parse(req.params.courses);
     const termCode = req.params.term;
 
-    const db = await sqlite.open({filename: 'courses.db', driver: sqlite3.Database})
-
     let tc = new TimetableCreator(termCode, selectedCourses, db);
     const {timetables, maxScheduleCountReached} = await tc.generateTimetables()
+
+    const log = {
+        selectedCourses: selectedCourses,
+        termCode: termCode,
+        maxScheduleCountReached: maxScheduleCountReached,
+        timetables_count: timetables.length
+    }
+    logger.logInfo("/api/generateTimeTable", JSON.stringify(log))
 
     res.send({timetables: timetables, limitReached: maxScheduleCountReached});
 })
 
-app.listen(3000, () => {
+app.get('/api/logs/:token', async (req, res) => {
+    if(req.params.token !== process.env.token){
+        return res.status(403).send('Forbidden: Invalid token');
+    }
+    const logs = await logger.getLogs()
+    console.log(logs)
+    res.send(logs)
+})
+
+app.listen(3000, async () => {
+    db = await sqlite.open({
+        filename: 'courses.db', driver: sqlite3.Database
+    })
+    logger = new Logger(db)
     console.log(`Server is listening on port ${port}.`)
 });
