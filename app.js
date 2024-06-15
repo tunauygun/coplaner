@@ -3,6 +3,7 @@ const bodyParser = require('body-parser')
 const sqlite = require("sqlite");
 const sqlite3 = require("sqlite3");
 const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 
 const {getCourseCodes, getAcademicYear} = require("./database");
 const {TimetableCreator} = require("./TimetableCreator");
@@ -21,6 +22,14 @@ app.use(
         },
     })
 )
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 200,
+    standardHeaders: true,
+    legacyHeaders: false,
+})
+app.use(limiter)
 
 app.get('/', async (req, res) => {
     const db = await sqlite.open({
