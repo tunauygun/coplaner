@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require('body-parser')
 const sqlite = require("sqlite");
 const sqlite3 = require("sqlite3");
+const helmet = require("helmet");
 
 const {getCourseCodes, getAcademicYear} = require("./database");
 const {TimetableCreator} = require("./TimetableCreator");
@@ -12,6 +13,14 @@ const port = process.env.PORT || 3000;
 app.set('view engine', 'ejs')
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({extended: false}))
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        },
+    })
+)
 
 app.get('/', async (req, res) => {
     const db = await sqlite.open({
@@ -43,7 +52,6 @@ app.post('/schedule', async (req, res) => {
 
     res.render('schedule', {selectedCourses, termCode})
 })
-
 
 app.get('/example', async (req, res) => {
     let termCode = 202510;
