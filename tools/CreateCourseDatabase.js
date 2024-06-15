@@ -262,6 +262,20 @@ function formatCourseRowsToCourse(rows, termCode) {
     return courses;
 }
 
+function createIndex(db) {
+    db.run(`CREATE INDEX "index_courseSchedule" ON "courseSchedule" ("subject", "number")`, function (error) {
+        if (error) {
+            console.error(error.message);
+        }
+    });
+
+    db.run(`CREATE INDEX "index_courses" ON "courses" ("subject", "number")`, function (error) {
+        if (error) {
+            console.error(error.message);
+        }
+    });
+}
+
 async function main() {
     let db = await getDatabase()
     let allCourses = []
@@ -277,10 +291,12 @@ async function main() {
         }
     }
     allCourses = allCourses.filter(value => Object.keys(value).length !== 0);
-    console.log(allCourses.length)
+    console.log(`Found ${allCourses.length} courses. \nAdding courses to the database...`)
     for (let c of allCourses) {
         insertCourse(db, c)
     }
+    createIndex(db)
+    console.log('Database created!')
 }
 
 main()
