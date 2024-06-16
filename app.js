@@ -20,11 +20,8 @@ app.set('view engine', 'ejs')
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(
-    helmet.contentSecurityPolicy({
-        directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-        },
+    helmet({
+        contentSecurityPolicy: false,
     })
 )
 
@@ -149,7 +146,6 @@ app.get('/api/logs/:token', async (req, res) => {
         return res.status(403).send('Forbidden: Invalid token');
     }
     const logs = await logger.getLogs()
-    console.log(logs)
     res.send(logs)
 })
 

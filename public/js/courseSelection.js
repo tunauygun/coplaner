@@ -35,6 +35,7 @@ let removeItem = function (subject, code) {
     $("#courseFormCourses").val(JSON.stringify(selectedCourses))
     if(Object.keys(selectedCourses).length === 0){
         $("#courseListTitle").text("").removeClass("border-top")
+        $("#courseListText").text("")
         $("#termSelector").prop('disabled', false);
         $("#formButton").addClass("invisible")
     }
@@ -65,6 +66,7 @@ $("#addButton").on( "click", function() {
     }
     if(Object.keys(selectedCourses).length === 0){
         $("#courseListTitle").text("Courses:").addClass("border-top")
+        $("#courseListText").text("You can click on the course names to unselect the course sections you don't want to take.")
         $("#termSelector").prop('disabled', true);
         $("#formButton").removeClass("invisible")
         $("#courseFormTerm").val($("#termSelector").val())
