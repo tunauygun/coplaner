@@ -5,6 +5,8 @@ const sqlite = require("sqlite");
 const sqlite3 = require("sqlite3");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
+const nodemailer = require('nodemailer')
+const mg = require('nodemailer-mailgun-transport')
 
 const {getCourseCodes, getAcademicYear} = require("./database");
 const {TimetableCreator} = require("./TimetableCreator");
@@ -33,6 +35,14 @@ const limiter = rateLimit({
     legacyHeaders: false,
 })
 app.use(limiter)
+
+const emailAuth = {
+    auth: {
+        api_key: process.env.MAILGUN_KEY,
+        domain: process.env.MAILGUN_DOMAIN
+    }
+}
+const nodemailerMailgun = nodemailer.createTransport(mg(emailAuth));
 
 app.get('/', async (req, res) => {
     const years = await getAcademicYear(db);
@@ -75,6 +85,37 @@ app.get('/example', async (req, res) => {
     selectedCourses = JSON.stringify(selectedCourses)
 
     res.render('schedule', {selectedCourses, termCode})
+})
+
+app.get('/contact', (req, res) => {
+    res.render('contact')
+})
+
+app.post('/contact', (req, res) => {
+    const {name, email, subject, message} = req.body;
+    let content = "Here is the details of the new message receiced from coplaner:\n"
+    content += "\nname: " + name
+    content += "\nemail: " + email
+    content += "\nsubject: " + subject
+    content += "\n\n" + message
+
+    nodemailerMailgun.sendMail({
+        from: `coplaner <coplaner@${process.env.MAILGUN_DOMAIN}>`,
+        to: 'contact.coplaner@gmail.com',
+        subject: 'coplaner - ' + subject,
+        text: content
+    }, (err, info) => {
+        if (err) {
+            console.log(`Error: ${err}`);
+            logger.logError("contactMail", err)
+            res.sendStatus(500)
+        }
+        else {
+            logger.logInfo("contactMail", info)
+            console.log(`Response: ${info}`);
+            res.sendStatus(200)
+        }
+    });
 })
 
 app.get('/api/courseSections/:term/:subject/:number', async (req, res) => {

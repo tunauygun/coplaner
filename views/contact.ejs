@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Welcome to coplaner, an unofficial web application that helps Carleton University students in generating conflict-free timetables.">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>coplaner - Contact</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link href="/css/gradient.css" rel="stylesheet" >
+</head>
+
+<body>
+<nav class="navbar navbar-expand-md gradient-background">
+    <div class="container container-fluid">
+        <a class="navbar-brand fw-bold" href="/">coplaner</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-link active mx-3" aria-current="page" href="/">Home</a>
+                <a class="nav-link mx-3" href="/select">Generate</a>
+                <a class="nav-link mx-3" href="/about">About</a>
+                <a class="nav-link mx-3" href="/contact">Contact</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<section class="py-5">
+    <div id="successMessage" class="alert alert-success alert-dismissible fade show col-6 offset-3 invisible" role="alert">
+        <strong>Thank you</strong> for your message!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div id="errorMessage" class="alert alert-danger alert-dismissible fade show col-6 offset-3 invisible" role="alert">
+        <strong>Error:</strong> Please try again later or send your message directly to <a href= "mailto: contact.coplaner@gmail.com"> contact.coplaner@gmail.com</a>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div class="container py-5">
+        <div class="row mb-4 mb-lg-5">
+            <div class="col-md-8 col-xl-6 text-center mx-auto">
+                <h2 class="fw-bold">Get in touch</h2>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-center">
+            <div class="col-md-6 col-xl-4">
+                <form action="/contact" method="POST" novalidate id="contactForm" class="needs-validation">
+                    <div class="mb-3">
+                        <label class="form-label" for="username">Name</label>
+                        <input class="form-control" type="text" id="username" name="username" placeholder="">
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="email">Email</label>
+                        <input class="form-control" type="email" id="email" name="email" placeholder="">
+                        <div id="emailHelp" class="form-text">Enter your email if you want to hear back.</div>
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="subject">Subject</label>
+                        <input class="form-control" type="text" id="subject" name="subject" placeholder="" required>
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="message">Message</label>
+                        <textarea  class="form-control" type="text" id="message" name="message" placeholder="" required></textarea>
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <button class="btn btn-success shadow d-block w-100">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer style="background: #efefef" class="footer px-5 py-4 fixed-bottom text-center">
+    &copy; <%=new Date().getFullYear()%> coplaner
+</footer>
+
+<script src='/js/jquery.min.js'></script>
+<script src="/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+<script src="/js/validateForms.js"></script>
+<script src="/js/contact.js"></script>
+</body>
+</html>
