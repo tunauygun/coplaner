@@ -33,6 +33,7 @@ let removeItem = function (subject, code) {
     $(`#li_${subject}${code}`).remove();
     delete selectedCourses[subject+"_"+code];
     $("#courseFormCourses").val(JSON.stringify(selectedCourses))
+    localStorage.setItem('selectedCourses', JSON.stringify(selectedCourses))
     if(Object.keys(selectedCourses).length === 0){
         $("#courseListTitle").text("").removeClass("border-top")
         $("#courseListText").text("")
@@ -54,16 +55,11 @@ let sectionSelectionChanged = function (cb) {
         }
     }
     $("#courseFormCourses").val(JSON.stringify(selectedCourses))
+    localStorage.setItem('selectedCourses', JSON.stringify(selectedCourses))
 }
 
 
-$("#addButton").on( "click", function() {
-    let term = $("#termSelector").val()
-    let subject = $("#subjectSelector").val();
-    let code = $("#codeSelector").val()
-    if(!subject || !code){
-        return;
-    }
+function addCourse(term, subject, code, isReloading = false, selectedSections = []) {
     if(Object.keys(selectedCourses).length === 0){
         $("#courseListTitle").text("Courses:").addClass("border-top")
         $("#courseListText").text("You can click on the course names to unselect the course sections you don't want to take.")
@@ -99,9 +95,10 @@ $("#addButton").on( "click", function() {
                        <div class="col-9 col-sm-11 d-flex align-items-center">`;
 
         for (let i = 0; i < sectionOptions.length; i++) {
+            let checked = (!isReloading || selectedSections.includes(sectionOptions[i])) ? "checked" : "" ;
             courseItem += `
                 <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="checkbox" id="s_${subject}${code}${sectionOptions[i]}" value="${subject} ${code} ${sectionOptions[i]}" onchange=\"sectionSelectionChanged(this)\" checked>
+                  <input class="form-check-input" type="checkbox" id="s_${subject}${code}${sectionOptions[i]}" value="${subject} ${code} ${sectionOptions[i]}" onchange=\"sectionSelectionChanged(this)\" ${checked}>
                   <label class="form-check-label" for="s_${subject}${code}${sectionOptions[i]}">${sectionOptions[i]}</label>
                 </div>
                 `
@@ -117,5 +114,47 @@ $("#addButton").on( "click", function() {
         $("#courseList").append(courseItem)
         selectedCourses[subject + "_" + code] = [...sectionOptions]
         $("#courseFormCourses").val(JSON.stringify(selectedCourses))
+        localStorage.setItem('selectedCourses', JSON.stringify(selectedCourses))
+        localStorage.setItem('selectedTerm', term)
+
+        let courses = JSON.parse(localStorage.getItem("selectedCourses"))
+        let selectedTerm = localStorage.getItem("selectedTerm")
+        console.log(selectedTerm, courses)
+    }
+}
+
+$("#addButton").on( "click", function() {
+    let term = $("#termSelector").val()
+    let subject = $("#subjectSelector").val();
+    let code = $("#codeSelector").val()
+    if(!subject || !code){
+        return;
+    }
+    addCourse(term, subject, code)
+});
+
+window.onpageshow = function (event) {
+    if (event.persisted) {
+        window.location.reload(); //reload page if it has been loaded from cache
+    }
+};
+
+$( document ).ready(function() {
+    let courses = JSON.parse(localStorage.getItem("selectedCourses"))
+    let term = localStorage.getItem("selectedTerm")
+
+    if(term !== null){
+        $("#termSelector").val(term);
+    }else{
+        $("#termSelector").val($("#termSelector option:first").val());
+    }
+    $('#termSelector').trigger('change');
+
+    if(courses !== null){
+        for (const courseName of Object.keys(courses)) {
+            const [subj, code] = courseName.split("_")
+            const sections = courses[courseName]
+            addCourse(term, subj, code, true, sections)
+        }
     }
 });
