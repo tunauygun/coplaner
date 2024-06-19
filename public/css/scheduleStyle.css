@@ -143,27 +143,29 @@ body {
     width: 100%;
     height: 100%;
 }
+
 .s-container .s-rows-container .s-activities .s-act-row .green {
-    background: linear-gradient(to right, #00b09b, #96c93d);
+    background: #BEBD6E;
 }
 .s-container .s-rows-container .s-activities .s-act-row .orange {
-    background: linear-gradient(to right, #F2994A, #F2C94C);
+    background: #DB767A;
 }
 .s-container .s-rows-container .s-activities .s-act-row .red {
-    background: linear-gradient(to right, #CB356B, #BD3F32);
+    background: #708C9C;
 }
 .s-container .s-rows-container .s-activities .s-act-row .yellow {
-    background: linear-gradient(to right, #fffc00, #fffc00);
+    background: #68B2DC;
 }
 .s-container .s-rows-container .s-activities .s-act-row .blue {
-    background: linear-gradient(to right, #36D1DC, #5B86E5);
+    background: #86866C;
 }
 .s-container .s-rows-container .s-activities .s-act-row .pink {
-    background: linear-gradient(to right, #834d9b, #d04ed6);
+    background: #866C6D;
 }
 .s-container .s-rows-container .s-activities .s-act-row .black {
-    background: linear-gradient(to right, #000428, #004e92);
+    background: #4C565C;
 }
+
 .s-container .s-rows-container .s-activities .s-act-row .s-act-tab {
     margin-left: 2%;
     width: 96%;
@@ -228,7 +230,7 @@ body {
 }
 
 .gradient-background {
-    background: linear-gradient(300deg, #00bfff, #ff4c68, #ef8172);
+    background: linear-gradient(300deg, #BEBD6E, #DB767A, #708C9C, #68B2DC);
     background-size: 20000% 20000%;
     animation: gradient-animation 18s ease infinite;
 }
