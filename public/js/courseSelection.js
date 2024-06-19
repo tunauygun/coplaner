@@ -39,6 +39,14 @@ let removeItem = function (subject, code) {
         $("#courseListText").text("")
         $("#termSelector").prop('disabled', false);
         $("#formButton").addClass("invisible")
+        $("#removeAllButton").addClass("invisible")
+    }
+}
+
+let removeAll = function (){
+    for (const courseName of Object.keys(selectedCourses)) {
+        const [subj, code] = courseName.split("_")
+        removeItem(subj, code)
     }
 }
 
@@ -65,6 +73,7 @@ function addCourse(term, subject, code, isReloading = false, selectedSections = 
         $("#courseListText").text("You can click on the course names to unselect the course sections you don't want to take.")
         $("#termSelector").prop('disabled', true);
         $("#formButton").removeClass("invisible")
+        $("#removeAllButton").removeClass("invisible")
         $("#courseFormTerm").val($("#termSelector").val())
     }
 
