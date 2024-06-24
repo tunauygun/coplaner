@@ -55,6 +55,7 @@ let removeItem = function (subject, code) {
         $("#termSelector").prop('disabled', false);
         $("#formButton").addClass("invisible")
         $("#removeAllButton").addClass("invisible")
+        $("#courseListDiv").css("display", "none");
     }
 }
 
@@ -190,6 +191,7 @@ let addCourse = function (term, subject, code, isReloading = false, selectedSect
         $("#termSelector").prop('disabled', true);
         $("#formButton").removeClass("invisible")
         $("#removeAllButton").removeClass("invisible")
+        $("#courseListDiv").css("display", "block");
         $("#courseFormTerm").val($("#termSelector").val())
     }
 
@@ -237,7 +239,7 @@ let addCourse = function (term, subject, code, isReloading = false, selectedSect
 
         courseItem += "</div></div></div>"
         $("#courseList").append(courseItem)
-        selectedCourses[subject + "_" + code] = [...sectionOptions]
+        selectedCourses[subject + "_" + code] = isReloading ? [...selectedSections] : [...sectionOptions]
         $("#courseFormCourses").val(JSON.stringify(selectedCourses))
         localStorage.setItem('selectedCourses', JSON.stringify(selectedCourses))
         localStorage.setItem('selectedTerm', term)
@@ -289,7 +291,10 @@ window.onpageshow = function (event) {
 };
 
 $( document ).ready(function() {
+    $("#courseListDiv").css("display", "none");
+    
     let courses = JSON.parse(localStorage.getItem("selectedCourses"))
+
     let term = localStorage.getItem("selectedTerm")
     let timesWOC = JSON.parse(localStorage.getItem("timesWOC"))
 
