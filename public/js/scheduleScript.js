@@ -178,7 +178,7 @@ $("#exportPdfButton").click(function() {
 });
 
 $.ajax({
-  url: `api/generateTimeTable/${term}/${courses}`,
+  url: `api/generateTimeTable/${term}/${courses}/${timesWithoutClasses}`,
   method: 'GET',
   success: function(response) {
     schedule.timetables = response.timetables;

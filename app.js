@@ -64,8 +64,9 @@ app.get('/schedule', (req, res) => {
 app.post('/schedule', async (req, res) => {
     let selectedCourses = req.body.selectedCourses;
     let termCode = req.body.term;
+    let timesWithoutClasses = req.body.timesWC;
 
-    res.render('schedule', {selectedCourses, termCode})
+    res.render('schedule', {selectedCourses, termCode, timesWithoutClasses})
 })
 
 app.get('/example', async (req, res) => {
@@ -123,11 +124,12 @@ app.get('/api/courseSections/:term/:subject/:number', async (req, res) => {
     res.send(courses.map(course => course.section));
 })
 
-app.get('/api/generateTimeTable/:term/:courses', async (req, res) => {
+app.get('/api/generateTimeTable/:term/:courses/:timesWC', async (req, res) => {
     const selectedCourses = JSON.parse(req.params.courses);
     const termCode = req.params.term;
+    const timesWithoutClasses = JSON.parse(req.params.timesWC);
 
-    let tc = new TimetableCreator(termCode, selectedCourses, db);
+    let tc = new TimetableCreator(termCode, selectedCourses, timesWithoutClasses, db);
     const {timetables, maxScheduleCountReached} = await tc.generateTimetables()
 
     const log = {

@@ -1,10 +1,11 @@
 const sqlite = require("sqlite");
 const sqlite3 = require("sqlite3");
 
-function TimetableCreator(term, requiredCourseNames, db) {
+function TimetableCreator(term, requiredCourseNames, timesWithoutClasses, db) {
 
     this.requiredCourseNames = requiredCourseNames;
     this.term = term;
+    this.timesWithoutClasses = timesWithoutClasses;
     this.db = db;
 
     function generateCombinations(groups) {
@@ -47,41 +48,19 @@ function TimetableCreator(term, requiredCourseNames, db) {
         const MAX_SCHEDULE_LIMIT = 50;
         const chunkSize = MAX_SCHEDULE_LIMIT / 5;
 
+        let timetables = []
         let allScheduleOptions = [];
         for (let i = 0; i < unfilteredScheduleOptions.length; i += chunkSize) {
-            if(allScheduleOptions.length >= MAX_SCHEDULE_LIMIT ){
-                allScheduleOptions = allScheduleOptions.slice(0, MAX_SCHEDULE_LIMIT);
+            if(timetables.length >= MAX_SCHEDULE_LIMIT ){
+                timetables = timetables.slice(0, MAX_SCHEDULE_LIMIT);
                 maxScheduleCountReached = true;
                 break;
             }
-
+            console.log(unfilteredScheduleOptions.length, i, timetables.length)
             let chunk = unfilteredScheduleOptions.slice(i, i + chunkSize);
             let processedChunk = await filterForConflictFreeSchedules(chunk);
-            allScheduleOptions.push(...processedChunk);
-        }
-
-        let timetables = []
-
-        for (let courses of allScheduleOptions) {
-            const courseList = courses.map(courseString => {
-                const courseInfo = courseString.split(" ");
-                return [courseInfo[0], courseInfo[1], courseInfo[2]];
-            })
-
-            const query = `
-                SELECT c.*, s.day, s.start_time, s.end_time
-                FROM courses c
-                         LEFT OUTER JOIN courseSchedule s ON c.term = s.term AND c.subject = s.subject AND c.number = s.number AND c.section = s.section
-                WHERE c.term = ${term}
-                  AND (
-                    ${courseList.map((c, index) => `
-                    (c.subject = '${c[0]}' AND c.number = ${c[1]} AND c.section = '${c[2]}')
-                `).join('OR')}
-                    )
-            `;
-
-            const result = await db.all(query)
-            timetables.push(result);
+            let filteredTimetables = await filterForScheduleFilters(processedChunk)
+            timetables.push(...filteredTimetables);
         }
 
         return {timetables, maxScheduleCountReached};
@@ -105,7 +84,6 @@ function TimetableCreator(term, requiredCourseNames, db) {
 
 
     let checkScheduleForConflict = async function (courses) {
-
         const courseList = courses.map(courseString => {
             const courseInfo = courseString.split(" ");
             return [courseInfo[0], courseInfo[1], courseInfo[2]];
@@ -141,6 +119,63 @@ function TimetableCreator(term, requiredCourseNames, db) {
         return result["COUNT()"]
     }
 
+    let filterForScheduleFilters = async function (unfilteredScheduleOptions) {
+        const promises = unfilteredScheduleOptions.map(scheduleOption =>
+            checkScheduleForScheduleFilters(scheduleOption)
+        );
+
+        let timetables = await Promise.all(promises);
+        timetables = timetables.filter(t => t!==null)
+        return timetables;
+    }
+
+    let checkScheduleForScheduleFilters = async function (courses) {
+        const courseList = courses.map(courseString => {
+            const courseInfo = courseString.split(" ");
+            return [courseInfo[0], courseInfo[1], courseInfo[2]];
+        })
+
+        const query = `
+            SELECT c.*, s.day, s.start_time, s.end_time
+            FROM courses c
+                     LEFT OUTER JOIN courseSchedule s ON c.term = s.term AND c.subject = s.subject AND c.number = s.number AND c.section = s.section
+            WHERE c.term = ${term}
+              AND (
+                ${courseList.map((c, index) => `
+                    (c.subject = '${c[0]}' AND c.number = ${c[1]} AND c.section = '${c[2]}')
+                `).join('OR')}
+                )
+        `;
+
+        const result = await db.all(query)
+
+        for(course of result) {
+            const {day, start_time, end_time} = course
+            for(const filter of timesWithoutClasses) {
+                const [filter_day, filter_start_time, filter_end_time] = filter
+                if(day === filter_day && hasTimeConflict(start_time, end_time, filter_start_time, filter_end_time)){
+                    return null
+                }
+            }
+        }
+
+        return result;
+    }
+
+    let hasTimeConflict = function (startTime1, endTime1, startTime2, endTime2) {
+        function timeToMinutes(time) {
+            const [hours, minutes] = time.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+
+        const start_time1 = timeToMinutes(startTime1);
+        const end_time1 = timeToMinutes(endTime1);
+        const start_time2 = timeToMinutes(startTime2);
+        const end_time2 = timeToMinutes(endTime2);
+
+        return (start_time1 < end_time2 && end_time1 > start_time2) || (start_time1 === start_time2 && end_time1 === end_time2)
+    }
+
 
     let getAllScheduleOptions = async function () {
         let scheduleSelectionGroups = []
@@ -166,7 +201,7 @@ function TimetableCreator(term, requiredCourseNames, db) {
         const courseCodeSeperated = courseCode.split("_")
         const subject = courseCodeSeperated[0];
         const number = parseInt(courseCodeSeperated[1]);
-        const result = await db.all(`SELECT * FROM courses WHERE term = ? AND subject = ? AND number = ? AND section IN ("${courseSections.join('", "')}")`, [term, subject, number]);
+        const result = await db.all(`SELECT subject, number, section, also_register_in FROM courses WHERE term = ? AND subject = ? AND number = ? AND section IN ("${courseSections.join('", "')}")`, [term, subject, number]);
 
         let allOptions = []
 

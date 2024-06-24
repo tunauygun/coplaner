@@ -2,12 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="description" content="Welcome to coplaner, an unofficial web application that helps Carleton University students in generating conflict-free timetables.">
+    <meta name="description"
+          content="Welcome to coplaner, an unofficial web application that helps Carleton University students in generating conflict-free timetables.">
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>coplaner - Course Selection</title>
-    <link rel="stylesheet" href="/css/bootstrap.min.css" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/bootstrap.min.css"
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/gradient.css">
 </head>
 
@@ -15,7 +17,8 @@
 <nav class="navbar navbar-expand-md gradient-background">
     <div class="container container-fluid">
         <a class="navbar-brand fw-bold" href="/">coplaner</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
@@ -29,7 +32,7 @@
     </div>
 </nav>
 
-<div class="container mt-5">
+<div class="container mt-5" >
     <h2 class="mb-5">Select Courses</h2>
     <div class="alert alert-warning alert-dismissible fade show" role="alert">
         <strong>Note:</strong> Don't enter any non-credit courses!
@@ -39,14 +42,14 @@
         <div class="col">
             <label for="termSelector" class="form-label">Term</label>
             <select class="form-select" aria-label="Default select example" id="termSelector">
-                <%   const getTermNameFromTermCode = function (termCode) {
-                        const termSeasons = ["Winter", "Summer", "Fall"]
-                        let termYear = termCode.trim().substring(0, 4)
-                        let termSeasonCode = parseInt(termCode.trim().substring(4, 5))-1
-                        return termSeasons[termSeasonCode] + " " + termYear
-                }%>
+                <% const getTermNameFromTermCode = function (termCode) {
+                    const termSeasons = ["Winter", "Summer", "Fall"]
+                    let termYear = termCode.trim().substring(0, 4)
+                    let termSeasonCode = parseInt(termCode.trim().substring(4, 5)) - 1
+                    return termSeasons[termSeasonCode] + " " + termYear
+                } %>
                 <% for (const term of Object.keys(courseCodes)){ %>
-                    <option value=<%=term%>><%=getTermNameFromTermCode(term)%></option>
+                <option value=<%= term %>><%= getTermNameFromTermCode(term) %></option>
                 <% } %>
             </select>
         </div>
@@ -56,7 +59,7 @@
             <label for="subjectSelector" class="form-label">Subject</label>
             <select class="form-select" aria-label="Default select example" id="subjectSelector">
                 <% for (const subject of Object.keys(courseCodes[Object.keys(courseCodes)[0]])){ %>
-                    <option value=<%=subject%>><%=subject%></option>
+                <option value=<%= subject %>><%= subject %></option>
                 <% } %>
             </select>
         </div>
@@ -64,7 +67,7 @@
             <label for="codeSelector" class="form-label">Code</label>
             <select class="form-select" aria-label="Default select example" id="codeSelector">
                 <% for (const code of courseCodes[Object.keys(courseCodes)[0]][Object.keys(courseCodes[Object.keys(courseCodes)[0]])[0]] ){ %>
-                <option value=<%=code%>><%=code%></option>
+                <option value=<%= code %>><%= code %></option>
                 <% } %>
             </select>
         </div>
@@ -78,32 +81,119 @@
         <p id="courseListText"></p>
 
         <div class="col d-flex align-items-end">
-            <button class="btn btn-outline-danger mb-3 btn-sm invisible" id="removeAllButton" onclick="removeAll()"> Remove all courses</button>
+            <button class="btn btn-outline-danger mb-3 btn-sm invisible" id="removeAllButton" onclick="removeAll()">
+                Remove all courses
+            </button>
         </div>
 
         <div class="accordion" id="courseList">
         </div>
     </div>
 
-    <form class="row mt-4 d-flex justify-content-center align-items-center" id="form" action="/schedule" method="post">
-        <div class="col-10 col-xs-8 col-sm-6 col-md-4 d-flex justify-content-center align-items-center">
-            <input type="hidden" name="selectedCourses" id="courseFormCourses">
-            <input type="hidden" name="term" id="courseFormTerm">
-            <button style="margin-bottom: 200px" class="btn btn-success w-100 invisible" id="formButton">Generate Schedule</button>
+    <div class="mt-5" id="filterDiv">
+        <h3 class="fs-4 pt-4 border-top">Schedule Options:</h3>
+
+        <h5 class="fs-6 pt-3">Days without classes</h5>
+
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="dayOffMon" value="Mon">
+            <label class="form-check-label" for="dayOffMon">Monday</label>
         </div>
-    </form>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="dayOffTue" value="Tue">
+            <label class="form-check-label" for="dayOffTue">Tuesday</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="dayOffWed" value="Wed">
+            <label class="form-check-label" for="dayOffWed">Wednesday</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="dayOffThu" value="Thu">
+            <label class="form-check-label" for="dayOffThu">Thursday</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="dayOffFri" value="Fri">
+            <label class="form-check-label" for="dayOffFri">Friday</label>
+        </div>
+
+
+        <h5 class="fs-6 pt-4">Times without classes</h5>
+
+        <div class="row">
+            <div class="col col-lg-3"></div>
+            <div class="col col-lg-2">From</div>
+            <div class="col col-lg-2">To</div>
+            <div class="col-1"></div>
+        </div>
+
+        <div id="timeFilterRows">
+            <div class="row py-1" id="timeFilterRow1">
+                <div class="col col-lg-3">
+                    <select class="form-select" id="daySelector1">
+                        <option value="All">Every day</option>
+                        <option value="Mon">Monday</option>
+                        <option value="Tue">Tuesday</option>
+                        <option value="Wed">Wednesday</option>
+                        <option value="Thu">Thursday</option>
+                        <option value="Fri">Friday</option>
+                    </select>
+                </div>
+                <div class="col col-lg-2">
+                    <input class="form-control" type="time" id="start1" step="900" name="start1">
+                    <div class="invalid-feedback">
+                        Please enter time.
+                    </div>
+                </div>
+                <div class="col col-lg-2">
+                    <input class="form-control" type="time" id="end1" step="900" name="end1">
+                    <div class="invalid-feedback">
+                        Please enter time.
+                    </div>
+                </div>
+                <div class="col-1">
+                    <button onclick="removeFilterItem(1)" type="button" class="btn btn-outline-danger">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-trash"
+                             viewBox="0 0 16 16">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"></path>
+                            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+        <div>
+            <button class="btn btn-outline-primary my-3 btn-sm" id="addFilterItemButton" onclick="addFilterItem()">
+                Add
+            </button>
+        </div>
+    </div>
+</div>
+
+<form class="row mt-4 d-flex justify-content-center align-items-center" id="form" action="/schedule" method="post">
+    <div class="col-10 col-xs-8 col-sm-6 col-md-4 d-flex justify-content-center align-items-center">
+        <input type="hidden" name="selectedCourses" id="courseFormCourses">
+        <input type="hidden" name="term" id="courseFormTerm">
+        <input type="hidden" name="timesWC" id="courseFormTimesWC">
+        <button style="margin-bottom: 200px" class="btn btn-success w-100 invisible" id="formButton">Generate Schedule
+        </button>
+    </div>
+</form>
 
 </div>
 
 <footer style="background: #efefef" class="footer px-5 py-4 fixed-bottom text-center">
-    &copy; <%=new Date().getFullYear()%> coplaner
+    &copy; <%= new Date().getFullYear() %> coplaner
 </footer>
 
 <script src='/js/jquery.min.js'></script>
-<script src="/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+<script src="/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
 <script src="/js/courseSelection.js"></script>
 <script>
-    let courseCodes = <%-JSON.stringify(courseCodes) %>;
+    let courseCodes = <%- JSON.stringify(courseCodes) %>;
 </script>
 </body>
 </html>
