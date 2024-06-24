@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
     <link rel="stylesheet" href="/css/scheduleStyle.css">
     <link rel="stylesheet" href="/css/bootstrap.min.css" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
 
@@ -44,7 +45,16 @@
     <div id="scheduleContent" class="mt-4 invisible">
         <div class='info text-center' >
             <h3 id="title">Schedule 1/2</h3>
+            <span id="star" class="fa fa-star ps-2" style="font-size: 22px; cursor: pointer"></span>
+            <div id="starToggle" style="display: none" class="pt-3">
+                <input type="radio" class="btn-check" name="options-starred" id="optionAll" autocomplete="off" checked>
+                <label class="btn btn-sm btn-outline-success" for="optionAll">All</label>
+
+                <input type="radio" class="btn-check" name="options-starred" id="optionStarred" autocomplete="off">
+                <label class="btn btn-sm btn-outline-success" for="optionStarred">Starred</label>
+            </div>
         </div>
+
         <div id="limitReachedWarning" class="alert alert-warning alert-dismissible fade show col-6 offset-3" role="alert">
             <strong>Warning:</strong> There are too many possible schedule options! Only the first 50 are shown!
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>

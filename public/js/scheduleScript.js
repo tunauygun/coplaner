@@ -1,7 +1,6 @@
 let schedule = {
   initialize: function(){
     schedule.activities.set();
-    
   },
   options: {
     schedule: '#schedule',
@@ -111,6 +110,11 @@ let schedule = {
         }
       }
       updateUnscheduledCourseList()
+      if(schedule.starred.includes(schedule.index)) {
+        $("#star").addClass("starred")
+      }else {
+        $("#star").removeClass("starred")
+      }
     }
   }
   
@@ -118,6 +122,7 @@ let schedule = {
 
 schedule.initialize();
 schedule.index = 0;
+schedule.starred = []
 
 let updateUnscheduledCourseList = function () {
   let unscheduledCourses = schedule.timetables[schedule.index].filter(course => course.is_synchronous === 0)
@@ -135,17 +140,33 @@ let updateUnscheduledCourseList = function () {
 }
 
 let nextSchedule = function() {
-  if(schedule.index+1<schedule.len){
-    schedule.index += 1;
-    schedule.activities.update()
+  if($("#optionAll").is(':checked')){
+    if(schedule.index+1<schedule.len){
+      schedule.index += 1;
+    }
+  } else {
+    const starredListIndex = schedule.starred.indexOf(schedule.index);
+    if(starredListIndex+1<schedule.starred.length){
+      schedule.index = schedule.starred[starredListIndex+1];
+    }
   }
+  schedule.activities.update()
 }
 
 let prevSchedule = function() {
-  if(schedule.index-1>=0){
-    schedule.index -= 1;
-    schedule.activities.update()
+  if($("#optionAll").is(':checked')){
+    if(schedule.index-1>=0){
+      schedule.index -= 1;
+
+    }
+  } else {
+    const starredListIndex = schedule.starred.indexOf(schedule.index);
+    if(starredListIndex-1>=0){
+      schedule.index = schedule.starred[starredListIndex-1];
+    }
   }
+
+  schedule.activities.update()
 }
 
 $("#next").on( "click", nextSchedule);
@@ -175,6 +196,41 @@ $("#copyCRNs").click(function() {
 $("#exportPdfButton").click(function() {
   window.print()
 });
+
+$("#star").click(function() {
+  if(schedule.starred.includes(schedule.index)){
+    $("#star").removeClass("starred")
+
+    // remove current index from starred list
+    schedule.starred.splice(schedule.starred.indexOf(schedule.index), 1);
+
+    if(schedule.starred.length < 1){
+      $("#starToggle").css("display", "none");
+      $("#optionAll").prop("checked", true);
+      $("#optionStarred").prop("checked", false);
+    }else{
+      let closest = schedule.starred.reduce(function(prev, curr) {
+        return (Math.abs(curr - schedule.index) < Math.abs(prev - schedule.index) ? curr : prev);
+      });
+      schedule.index = closest
+      schedule.activities.update()
+    }
+  }else{
+    $("#star").addClass("starred")
+    schedule.starred.push(schedule.index);
+    $("#starToggle").css("display", "block");
+  }
+});
+
+$("#optionStarred").change(function (){
+  if($("#optionStarred").is(':checked') && !schedule.starred.includes(schedule.index)){
+    let closest = schedule.starred.reduce(function(prev, curr) {
+      return (Math.abs(curr - schedule.index) < Math.abs(prev - schedule.index) ? curr : prev);
+    });
+    schedule.index = closest
+    schedule.activities.update()
+  }
+})
 
 $.ajax({
   url: `api/generateTimeTable/${term}/${courses}/${timesWithoutClasses}`,

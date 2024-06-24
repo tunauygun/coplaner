@@ -229,6 +229,14 @@ body {
     visibility: hidden;
 }
 
+.starred {
+    color: orange;
+}
+
+#title {
+    display: inline-block;
+}
+
 .gradient-background {
     background: linear-gradient(300deg, #BEBD6E, #DB767A, #708C9C, #68B2DC);
     background-size: 20000% 20000%;
@@ -254,6 +262,7 @@ body {
         -webkit-print-color-adjust: exact;
     }
     #title {
+        display: block; !important;
         visibility: visible;
         position: absolute;
         top: 0;
