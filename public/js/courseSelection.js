@@ -246,7 +246,6 @@ let addCourse = function (term, subject, code, isReloading = false, selectedSect
 
         let courses = JSON.parse(localStorage.getItem("selectedCourses"))
         let selectedTerm = localStorage.getItem("selectedTerm")
-        console.log(selectedTerm, courses)
     }
 }
 
@@ -292,7 +291,7 @@ window.onpageshow = function (event) {
 
 $( document ).ready(function() {
     $("#courseListDiv").css("display", "none");
-    
+
     let courses = JSON.parse(localStorage.getItem("selectedCourses"))
 
     let term = localStorage.getItem("selectedTerm")

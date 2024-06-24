@@ -55,7 +55,6 @@ function TimetableCreator(term, requiredCourseNames, timesWithoutClasses, db) {
                 maxScheduleCountReached = true;
                 break;
             }
-            console.log(unfilteredScheduleOptions.length, i, allScheduleOptions.length)
             let chunk = unfilteredScheduleOptions.slice(i, i + chunkSize);
             let processedChunk = await filterForConflictFreeSchedules(chunk);
             allScheduleOptions.push(...processedChunk);

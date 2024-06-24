@@ -106,7 +106,6 @@ let schedule = {
       for (let i = 0; i <Object.keys(sycnCourseGroups).length; i++) {
         let coursesAtGroup = sycnCourseGroups[Object.keys(sycnCourseGroups)[i]]
         let groupColor = colors[i % colors.length]
-        console.log(i, groupColor)
         for (const c of coursesAtGroup) {
           schedule.activities.add(convertDaysOfWeekToNumbers(c.day), c.subject + " " + c.number , c.start_time + "-" + c.end_time, "", c.section, c.instructor, groupColor);
         }

@@ -81,8 +81,9 @@ app.get('/example', async (req, res) => {
         "SYSC_3101": ["A"]
     };
     selectedCourses = JSON.stringify(selectedCourses)
+    let timesWithoutClasses = "[]"
 
-    res.render('schedule', {selectedCourses, termCode})
+    res.render('schedule', {selectedCourses, termCode, timesWithoutClasses})
 })
 
 app.get('/contact', (req, res) => {
@@ -104,13 +105,11 @@ app.post('/contact', (req, res) => {
         text: content
     }, (err, info) => {
         if (err) {
-            console.log(`Error: ${err}`);
             logger.logError("contactMail", err)
             res.sendStatus(500)
         }
         else {
             logger.logInfo("contactMail", info)
-            console.log(`Response: ${info}`);
             res.sendStatus(200)
         }
     });
