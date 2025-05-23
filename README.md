@@ -6,7 +6,6 @@ Welcome to Coplaner, an unofficial web application developed to assist Carleton 
 ![image](https://github.com/user-attachments/assets/050960b8-87d4-40c3-9b7c-40e736697c34)
 
 ## Built With
-
 * [![JavaScript][JavaScript.com]][JavaScript-url]
 * [![HTML][HTML.com]][HTML-url]
 * [![Node.js][Node.js.com]][Node.js-url]
