@@ -45,7 +45,7 @@ function TimetableCreator(term, requiredCourseNames, timesWithoutClasses, db) {
         const unfilteredScheduleOptions = await getAllScheduleOptions()
 
         let maxScheduleCountReached = false;
-        const MAX_SCHEDULE_LIMIT = 50;
+        const MAX_SCHEDULE_LIMIT = 75;
         const chunkSize = MAX_SCHEDULE_LIMIT / 5;
 
         let allScheduleOptions = [];
