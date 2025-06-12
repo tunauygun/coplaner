@@ -3,6 +3,7 @@ const express = require("express");
 const bodyParser = require('body-parser')
 const sqlite = require("sqlite");
 const sqlite3 = require("sqlite3");
+const sql = require('mssql');
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const nodemailer = require('nodemailer')
@@ -33,6 +34,19 @@ const limiter = rateLimit({
 })
 app.use(limiter)
 
+const logDbConfig = {
+    user: process.env.LOG_DB_USER,
+    password: process.env.LOG_DB_PASSWORD,
+    server: process.env.LOG_DB_SERVER,
+    database: process.env.LOG_DB_NAME,
+    authentication: {
+        type: 'default'
+    },
+    options: {
+        encrypt: true
+    }
+};
+
 const emailAuth = {
     auth: {
         api_key: process.env.MAILGUN_KEY,
@@ -43,7 +57,7 @@ const nodemailerMailgun = nodemailer.createTransport(mg(emailAuth));
 
 app.get('/', async (req, res) => {
     const years = await getAcademicYear(db);
-    logger.logInfo("visit", "/home")
+    // logger.logInfo("visit", "/home")
     res.render('home', {academicYear: years})
 })
 
@@ -151,9 +165,16 @@ app.get('/api/logs/:token', async (req, res) => {
 })
 
 app.listen(3000, async () => {
-    db = await sqlite.open({
-        filename: 'courses.db', driver: sqlite3.Database
-    })
-    logger = new Logger(db)
-    console.log(`Server is listening on port ${port}.`)
+    try {
+        db = await sqlite.open({
+            filename: 'courses.db', driver: sqlite3.Database
+        })
+
+        const pool = await sql.connect(logDbConfig);
+        logger = new Logger(pool);
+        console.log(`Server is listening on port ${port}.`)
+
+    } catch (err) {
+        console.error('Connection failed:', err.message);
+    }
 });

@@ -1,37 +1,52 @@
-const sqlite3 = require('sqlite3');
-const sqlite = require("sqlite");
+const sql = require('mssql');
 
-function Logger(db) {
-    this.db = db;
+function Logger(pool) {
+    this.pool = pool;
 
-    this.logEvent = function (severity, eventType, message) {
-        const sql = `INSERT INTO logs (severity, event_type, message) VALUES (?, ?, ?)`;
-        db.run(sql, [severity, eventType, message], function(err) {
-            if (err) {
-                return console.error(err.message);
-            }
-        });
+    this.logEvent = async function (severity, eventType, message) {
+        try {
+            await pool.request()
+                .input('severity', sql.VarChar(10), severity)
+                .input('eventType', sql.VarChar(50), eventType)
+                .input('message', sql.NVarChar(sql.MAX), message)
+                .query(`INSERT INTO logs (severity, event_type, message) VALUES (@severity, @eventType, @message)`);
+        } catch (err) {
+            console.error('Error inserting log:', err.message);
+        }
+    };
+
+
+    this.logInfo = async function (eventType, message) {
+        await this.logEvent("info", eventType, message);
     }
 
-    this.logInfo = function (eventType, message) {
-        this.logEvent("info", eventType, message);
-    }
-
-    this.logError = function (eventType, message) {
-        this.logEvent("error", eventType, message);
+    this.logError = async function (eventType, message) {
+        await this.logEvent("error", eventType, message);
     }
 
     this.getLogs = async function () {
-        const query = `SELECT * FROM logs ORDER BY timestamp DESC`;
-        let logs = await db.all(query)
-        for (let log of logs) {
-            try {
-                log.message = JSON.parse(log.message);
-            } catch (e) { }
+        try {
+            const result = await pool.request().query(`
+                SELECT
+                    id,
+                    severity,
+                    event_type,
+                    message,
+                    FORMAT(SWITCHOFFSET(timestamp, '-04:00'), 'yyyy-MM-dd HH:mm:ss zzz') AS ottawa_time 
+                FROM logs 
+                ORDER BY timestamp DESC`);
+            let logs = result.recordset;
+            for (let log of logs) {
+                try {
+                    log.message = JSON.parse(log.message);
+                } catch (e) { }
+            }
+            return logs;
+        } catch (err) {
+            console.error('Error retrieving logs:', err.message);
+            return [];
         }
-        return logs
     }
-
 }
 
 module.exports.Logger = Logger;
